@@ -1,26 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public void Update()
+    public GameObject Player => player;
+    private GameObject player;
+
+    private Rigidbody playerRB;
+
+    public float movementSpeed = 7.5f;
+    public float stoppingForce = 12.0f;
+
+    private Vector2 movement;
+
+    private void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.W))
+        player = this.gameObject;
+        playerRB = GetComponent<Rigidbody>();
+    }
+
+    private void Update()
+    {
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+
+         movement = new Vector2(horizontalInput, verticalInput).normalized * movementSpeed;
+
+        playerRB.velocity = movement;
+    }
+
+    private void FixedUpdate()
+    {
+        if (movement.magnitude == 0f && playerRB.velocity.magnitude > 0f)
         {
-            Debug.Log("W pressed");
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            Debug.Log("S pressed");
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            Debug.Log("A pressed");
-        }
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            Debug.Log("D pressed");
+            Vector2 stopForce = -playerRB.velocity * stoppingForce;
+            playerRB.AddForce(stopForce);
         }
     }
 }
